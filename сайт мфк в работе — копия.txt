@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Футбольный Клуб - Главная</title>
+    <!-- Подключение Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Подключение Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Пользовательские стили */
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden; /* Предотвращаем горизонтальную прокрутку */
+            transition: background-color 0.3s ease-in-out; /* Плавное переключение цвета фона */
+        }
+
+        /* Пользовательский цвет обводки - теперь черный */
+        .border-custom-black {
+            border-color: rgb(0, 0, 0); /* Черный цвет */
+        }
+
+        /* Пользовательский синий цвет */
+        .bg-custom-blue {
+            background-color: rgb(93, 164, 256);
+        }
+
+        .text-custom-blue {
+            color: rgb(93, 164, 256);
+        }
+
+        /* Параллакс эффект для фона Hero Section */
+        .parallax-bg {
+            background-image: url('https://placehold.co/1920x1080/E0E0E0/333333?text=ФОНОВОЕ+ИЗОБРАЖЕНИЕ+JPEG'); /* Замените на ваше JPEG изображение */
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed; /* Это создает основной параллакс эффект */
+        }
+
+        /* Стили для PNG изображений на главной странице */
+        .hero-png {
+            position: absolute;
+            transition: transform 0.3s ease-out; /* Плавное движение при наведении */
+        }
+
+        /*
+         * Обновленные начальные позиции для PNG.
+         * Трансформации заданы так, чтобы центральное PNG было немного больше и ниже,
+         * а задние PNG выглядывали из-за него.
+         */
+        .hero-png-composition .hero-png-center {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -40%) scale(1.1); /* Увеличено и опущено */
+            width: 600px;
+            height: 600px;
+            z-index: 30;
+        }
+
+        .hero-png-composition .hero-png-left {
+            top: 50%;
+            left: 50%;
+            transform: translate(-350px, 0);
+            width: 150px;
+            height: 150px;
+            z-index: 20;
+        }
+
+        .hero-png-composition .hero-png-right {
+            top: 50%;
+            left: 50%;
+            transform: translate(380px, 0);
+            width: 180px;
+            height: 180px;
+            z-index: 20;
+        }
+
+        /* Позиции задних PNG изменены, чтобы они выглядывали на 40% */
+        .hero-png-composition .hero-png-back-1 {
+            top: 50%;
+            left: 50%;
+            transform: translate(250px, 150px) rotate(20deg);
+            width: 200px;
+            height: 200px;
+            z-index: 10;
+        }
+
+        .hero-png-composition .hero-png-back-2 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-250px, -150px) rotate(-20deg);
+            width: 200px;
+            height: 200px;
+            z-index: 10;
+        }
+
+        .hero-png-composition .hero-png-back-3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(200px, -100px) rotate(10deg);
+            width: 160px;
+            height: 160px;
+            z-index: 10;
+        }
+
+        /* Новые PNG спереди */
+        .hero-png-composition .hero-png-front-1 {
+            top: 50%;
+            left: 50%;
+            transform: translate(250px, -100px) rotate(-15deg);
+            width: 120px;
+            height: 120px;
+            z-index: 40;
+        }
+
+        .hero-png-composition .hero-png-front-2 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-300px, -150px) rotate(-10deg);
+            width: 120px;
+            height: 120px;
+            z-index: 50; /* Передний план */
+        }
+        
+        .hero-png-composition .hero-png-front-3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(300px, 150px) rotate(10deg);
+            width: 120px;
+            height: 120px;
+            z-index: 50; /* Передний план */
+        }
+
+        /* Стили для параллакс-изображений под разделами */
+        .parallax-section-image {
+            position: absolute;
+            z-index: -1; /* Помещаем за контентом раздела */
+            pointer-events: none; /* Не реагируют на события мыши */
+        }
+
+        /* Новые стили для "летающих" PNG-изображений */
+        .parallax-flying-image {
+            position: fixed; /* Закрепляем относительно окна */
+            pointer-events: none;
+            opacity: 0; /* Изначально скрыты */
+            z-index: 10; /* Изменено: теперь под контентом, но над фоном */
+            transition: transform 0.1s linear, opacity 0.5s ease-in-out; /* Плавное движение и появление/исчезновение */
+        }
+
+        /* Пользовательские стили для градиента карточек */
+        .gradient-overlay {
+            background: linear-gradient(to top, rgba(93, 164, 256, 1) 0%, rgba(93, 164, 256, 0) 100%);
+        }
+
+        /* Стили для карточек игроков и эффекты при наведении */
+        .player-card {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            max-width: 250px; /* Ограничиваем максимальную ширину карточки */
+        }
+
+        .player-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.8), 0 0 50px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Стили для галереи */
+        .gallery-container {
+            scroll-behavior: smooth; /* Плавная прокрутка */
+            -webkit-overflow-scrolling: touch; /* Улучшенная прокрутка на iOS */
+            overflow-x: scroll;
+            /* Скрываем скроллбар */
+            -ms-overflow-style: none; /* IE and Edge */
+            scrollbar-width: none; /* Firefox */
+        }
+
+        .gallery-container::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Opera */
+        }
+
+        .gallery-image {
+            width: 100vw; /* Изображение на всю ширину вьюпорта */
+            height: 600px; /* Увеличенная высота */
+            object-fit: cover; /* Обрезка изображения для заполнения контейнера */
+        }
+
+        /* Стили для кнопок галереи - без фона и скругления */
+        .gallery-nav-button {
+            color: white; /* Цвет стрелок */
+            padding: 0.5rem; /* Уменьшен паддинг для более компактного вида */
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.3s ease; /* Плавный переход цвета и трансформации */
+            z-index: 40; /* Чтобы кнопки были поверх изображений */
+            font-size: 3rem; /* Увеличен размер иконок */
+            text-shadow: 0 0 5px rgba(0, 0, 0, 0.7); /* Тень для лучшей видимости */
+        }
+
+        .gallery-nav-button:hover {
+            color: rgb(93, 164, 256); /* Подсветка синим при наведении */
+            transform: scale(1.1);
+        }
+
+        /* Стили для иконок контактов */
+        .contact-icon {
+            transition: transform 0.3s ease-out, color 0.3s ease-out;
+        }
+
+        .contact-icon:hover, .contact-icon:active { /* Теперь подсвечиваются белым при наведении и нажатии */
+            transform: scale(1.1);
+            color: white; /* Белый цвет */
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- Закрепленное навигационное меню -->
+    <nav class="fixed top-0 left-0 w-full bg-white bg-opacity-90 shadow-lg z-50 py-4">
+        <div class="container mx-auto flex justify-center space-x-6">
+            <!-- Увеличено скругление до rounded-xl и обводка изменена на border-custom-black -->
+            <a href="#team" class="px-5 py-2 rounded-xl border-2 border-custom-black text-gray-800 hover:bg-custom-blue hover:text-white transition-colors duration-300 text-sm font-medium">Команда</a>
+            <a href="#management" class="px-5 py-2 rounded-xl border-2 border-custom-black text-gray-800 hover:bg-custom-blue hover:text-white transition-colors duration-300 text-sm font-medium">Руководящий состав</a>
+            <a href="#calendar" class="px-5 py-2 rounded-xl border-2 border-custom-black text-gray-800 hover:bg-custom-blue hover:text-white transition-colors duration-300 text-sm font-medium">Календарь игр</a>
+            <a href="#gallery" class="px-5 py-2 rounded-xl border-2 border-custom-black text-gray-800 hover:bg-custom-blue hover:text-white transition-colors duration-300 text-sm font-medium">Галерея</a>
+            <a href="#merch" class="px-5 py-2 rounded-xl border-2 border-custom-black text-gray-800 hover:bg-custom-blue hover:text-white transition-colors duration-300 text-sm font-medium">Мерч</a>
+            <a href="#about" class="px-5 py-2 rounded-xl border-2 border-custom-black text-gray-800 hover:bg-custom-blue hover:text-white transition-colors duration-300 text-sm font-medium">О клубе</a>
+            <a href="#contacts" class="px-5 py-2 rounded-xl border-2 border-custom-black text-gray-800 hover:bg-custom-blue hover:text-white transition-colors duration-300 text-sm font-medium">Контакты</a>
+        </div>
+    </nav>
+
+    <!-- Главная страница (Hero Section) с параллакс-фоном -->
+    <header id="home" class="relative w-full h-screen flex items-center justify-center overflow-hidden parallax-bg">
+        <!-- Убрали текст "Футбольный Клуб" -->
+        <div id="png-composition" class="relative flex items-center justify-center w-full h-full">
+            <!--
+             * PNG изображения. data-depth определяет силу параллакс-эффекта:
+             * Больше значение - сильнее движется.
+             * Новые PNG на переднем плане имеют самый большой depth.
+             -->
+            <img src="https://placehold.co/120x120/5D99FF/FFFFFF?text=ВПЕРЕДИ+PNG" alt="Изображение впереди 2" class="hero-png hero-png-front-2" data-depth="0.5">
+            <img src="https://placehold.co/120x120/FFD700/333333?text=ВПЕРЕДИ+PNG" alt="Изображение впереди 3" class="hero-png hero-png-front-3" data-depth="0.5">
+            <img src="https://placehold.co/120x120/00FFFF/333333?text=ВПЕРЕДИ+1+PNG" alt="Изображение впереди 1" class="hero-png hero-png-front-1" data-depth="0.4">
+
+            <img src="https://placehold.co/600x600/FF5733/FFFFFF?text=ЦЕНТР+PNG" alt="Центральное изображение" class="hero-png hero-png-center" data-depth="0.3">
+            
+            <img src="https://placehold.co/150x150/33FF57/FFFFFF?text=ЛЕВО+PNG" alt="Изображение слева" class="hero-png hero-png-left" data-depth="0.2">
+            <img src="https://placehold.co/180x180/57FF33/FFFFFF?text=ПНГ+СПРАВА" alt="Изображение справа" class="hero-png hero-png-right" data-depth="0.2">
+            
+            <!-- Задние PNG, выглядывающие на 40% с меньшим эффектом параллакса -->
+            <img src="https://placehold.co/200x200/3357FF/FFFFFF?text=СЗАДИ+1+PNG" alt="Изображение сзади 1" class="hero-png hero-png-back-1" data-depth="0.1">
+            <img src="https://placehold.co/200x200/FF33A1/FFFFFF?text=СЗАДИ+2+PNG" alt="Изображение сзади 2" class="hero-png hero-png-back-2" data-depth="0.1">
+            <img src="https://placehold.co/160x160/FFD700/333333?text=СЗАДИ+3+PNG" alt="Изображение сзади 3" class="hero-png hero-png-back-3" data-depth="0.1">
+        </div>
+    </header>
+
+    <!-- Основной контент страницы -->
+    <!-- Добавлен z-index, чтобы контент был над летающими изображениями -->
+    <main class="relative z-20">
+        <!-- Летающие PNG для параллакса на синем фоне -->
+        <!-- Убраны inline стили, чтобы избежать конфликтов -->
+        <img src="https://placehold.co/1200x1200/33A1FF/FFFFFF?text=ОЧЕНЬ+КРУПНЫЙ+PNG+1" alt="Летающий PNG 1" class="parallax-flying-image" data-initial-top="10" data-initial-left="-1200" data-initial-rotate="15" data-direction="1">
+        <img src="https://placehold.co/1000x1000/FF5733/FFFFFF?text=ОЧЕНЬ+КРУПНЫЙ+PNG+2" alt="Летающий PNG 2" class="parallax-flying-image" data-initial-top="85" data-initial-left="-1000" data-initial-rotate="-30" data-direction="1">
+        <img src="https://placehold.co/1500x1500/57FF33/FFFFFF?text=ОЧЕНЬ+КРУПНЫЙ+PNG+3" alt="Летающий PNG 3" class="parallax-flying-image" data-initial-top="25" data-initial-left="1000" data-initial-rotate="45" data-direction="-1">
+
+
+        <!-- Раздел "Команда" -->
+        <section id="team" class="py-20 relative overflow-hidden">
+            <div class="container mx-auto px-4 relative z-10">
+                <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Наша Команда</h2>
+                <!-- Адаптивная сетка с отступами -->
+                <!-- Изменены классы сетки для 5 карточек в ряд на больших экранах -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-items-center">
+                    <!-- Пример одной карточки игрока -->
+                    <!-- Высота карточки уменьшена для более стандартных пропорций -->
+                    <div class="player-card relative w-full h-80 overflow-hidden rounded-2xl shadow-lg">
+                        <!-- Фото игрока, занимает всю площадь карточки -->
+                        <img src="https://placehold.co/256x384/cccccc/333333?text=Фото+игрока" alt="Фото игрока" class="absolute inset-0 w-full h-full object-cover">
+                
+                        <!-- Градиентное наложение: синий снизу, прозрачный к центру -->
+                        <div class="gradient-overlay absolute bottom-0 left-0 w-full h-3/5"></div>
+                
+                        <!-- Контент: имя и фамилия, плашка позиции -->
+                        <div class="content absolute bottom-0 left-0 w-full text-center text-white p-4 box-border">
+                            <h2 class="text-xl font-semibold mb-1 truncate">Иван Иванов</h2>
+                            <!-- Плашка позиции -->
+                            <div class="position-tag inline-block bg-blue-900 text-white text-sm px-4 py-2 rounded-full font-medium">
+                                Нападающий
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Пример второй карточки игрока -->
+                    <div class="player-card relative w-full h-80 overflow-hidden rounded-2xl shadow-lg">
+                        <!-- Фото игрока -->
+                        <img src="https://placehold.co/256x384/999999/ffffff?text=Фото+игрока+2" alt="Фото игрока 2" class="absolute inset-0 w-full h-full object-cover">
+                
+                        <!-- Градиентное наложение -->
+                        <div class="gradient-overlay absolute bottom-0 left-0 w-full h-3/5"></div>
+                
+                        <!-- Контент -->
+                        <div class="content absolute bottom-0 left-0 w-full text-center text-white p-4 box-border">
+                            <h2 class="text-xl font-semibold mb-1 truncate">Петр Петров</h2>
+                            <!-- Плашка позиции -->
+                            <div class="position-tag inline-block bg-blue-900 text-white text-sm px-4 py-2 rounded-full font-medium">
+                                Защитник
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Пример третьей карточки игрока -->
+                    <div class="player-card relative w-full h-80 overflow-hidden rounded-2xl shadow-lg">
+                        <!-- Фото игрока -->
+                        <img src="https://placehold.co/256x384/666666/ffffff?text=Фото+игрока+3" alt="Фото игрока 3" class="absolute inset-0 w-full h-full object-cover">
+                
+                        <!-- Градиентное наложение -->
+                        <div class="gradient-overlay absolute bottom-0 left-0 w-full h-3/5"></div>
+                
+                        <!-- Контент -->
+                        <div class="content absolute bottom-0 left-0 w-full text-center text-white p-4 box-border">
+                            <h2 class="text-xl font-semibold mb-1 truncate">Сергей Сидоров</h2>
+                            <!-- Плашка позиции -->
+                            <div class="position-tag inline-block bg-blue-900 text-white text-sm px-4 py-2 rounded-full font-medium">
+                                Вратраь
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Добавленная четвертая карточка -->
+                    <div class="player-card relative w-full h-80 overflow-hidden rounded-2xl shadow-lg">
+                        <img src="https://placehold.co/256x384/555555/ffffff?text=Фото+игрока+4" alt="Фото игрока 4" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="gradient-overlay absolute bottom-0 left-0 w-full h-3/5"></div>
+                        <div class="content absolute bottom-0 left-0 w-full text-center text-white p-4 box-border">
+                            <h2 class="text-xl font-semibold mb-1 truncate">Алексей Смирнов</h2>
+                            <div class="position-tag inline-block bg-blue-900 text-white text-sm px-4 py-2 rounded-full font-medium">
+                                Полузащитник
+                            </div>
+                        </div>
+                    </div>
+                
+                    <!-- Добавленная пятая карточка -->
+                    <div class="player-card relative w-full h-80 overflow-hidden rounded-2xl shadow-lg">
+                        <img src="https://placehold.co/256x384/444444/ffffff?text=Фото+игрока+5" alt="Фото игрока 5" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="gradient-overlay absolute bottom-0 left-0 w-full h-3/5"></div>
+                        <div class="content absolute bottom-0 left-0 w-full text-center text-white p-4 box-border">
+                            <h2 class="text-xl font-semibold mb-1 truncate">Дмитрий Федоров</h2>
+                            <div class="position-tag inline-block bg-blue-900 text-white text-sm px-4 py-2 rounded-full font-medium">
+                                Нападающий
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Раздел "Руководящий состав" -->
+        <section id="management" class="py-20 relative overflow-hidden">
+            <div class="container mx-auto px-4 relative z-10">
+                <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Руководящий Состав</h2>
+                <!-- Изменены классы сетки для 5 карточек в ряд на больших экранах -->
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 justify-items-center">
+                    <!-- Пример карточки руководителя -->
+                    <div class="player-card relative w-full h-80 overflow-hidden rounded-2xl shadow-lg">
+                        <img src="https://placehold.co/300x300/C0C0C0/333333?text=Руководитель+1" alt="Руководитель 1" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="gradient-overlay absolute bottom-0 left-0 w-full h-3/5"></div>
+                        <div class="content absolute bottom-0 left-0 w-full text-center text-white p-4 box-border">
+                            <h2 class="text-xl font-semibold mb-1 truncate">Олег Иванов</h2>
+                            <div class="position-tag inline-block bg-blue-900 text-white text-sm px-4 py-2 rounded-full font-medium">
+                                Генеральный директор
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Добавьте еще руководителей по аналогии -->
+                    <div class="player-card relative w-full h-80 overflow-hidden rounded-2xl shadow-lg">
+                        <img src="https://placehold.co/300x300/C0C0C0/333333?text=Руководитель+2" alt="Руководитель 2" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="gradient-overlay absolute bottom-0 left-0 w-full h-3/5"></div>
+                        <div class="content absolute bottom-0 left-0 w-full text-center text-white p-4 box-border">
+                            <h2 class="text-xl font-semibold mb-1 truncate">Мария Сидорова</h2>
+                            <div class="position-tag inline-block bg-blue-900 text-white text-sm px-4 py-2 rounded-full font-medium">
+                                Спортивный директор
+                            </div>
+                        </div>
+                    </div>
+                    <div class="player-card relative w-full h-80 overflow-hidden rounded-2xl shadow-lg">
+                        <img src="https://placehold.co/300x300/C0C0C0/333333?text=Руководитель+3" alt="Руководитель 3" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="gradient-overlay absolute bottom-0 left-0 w-full h-3/5"></div>
+                        <div class="content absolute bottom-0 left-0 w-full text-center text-white p-4 box-border">
+                            <h2 class="text-xl font-semibold mb-1 truncate">Сергей Кузнецов</h2>
+                            <div class="position-tag inline-block bg-blue-900 text-white text-sm px-4 py-2 rounded-full font-medium">
+                                Главный тренер
+                            </div>
+                        </div>
+                    </div>
+                    <div class="player-card relative w-full h-80 overflow-hidden rounded-2xl shadow-lg">
+                        <img src="https://placehold.co/300x300/C0C0C0/333333?text=Руководитель+4" alt="Руководитель 4" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="gradient-overlay absolute bottom-0 left-0 w-full h-3/5"></div>
+                        <div class="content absolute bottom-0 left-0 w-full text-center text-white p-4 box-border">
+                            <h2 class="text-xl font-semibold mb-1 truncate">Елена Николаева</h2>
+                            <div class="position-tag inline-block bg-blue-900 text-white text-sm px-4 py-2 rounded-full font-medium">
+                                Менеджер по маркетингу
+                            </div>
+                        </div>
+                    </div>
+                    <div class="player-card relative w-full h-80 overflow-hidden rounded-2xl shadow-lg">
+                        <img src="https://placehold.co/300x300/C0C0C0/333333?text=Руководитель+5" alt="Руководитель 5" class="absolute inset-0 w-full h-full object-cover">
+                        <div class="gradient-overlay absolute bottom-0 left-0 w-full h-3/5"></div>
+                        <div class="content absolute bottom-0 left-0 w-full text-center text-white p-4 box-border">
+                            <h2 class="text-xl font-semibold mb-1 truncate">Павел Захаров</h2>
+                            <div class="position-tag inline-block bg-blue-900 text-white text-sm px-4 py-2 rounded-full font-medium">
+                                Финансовый директор
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Раздел "Календарь игр" -->
+        <section id="calendar" class="py-20 relative overflow-hidden">
+            <div class="container mx-auto px-4 relative z-10">
+                <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Календарь Игр</h2>
+                <div class="overflow-x-auto rounded-lg shadow-md">
+                    <table class="min-w-full border-collapse">
+                        <thead>
+                            <tr class="bg-gray-800 text-white">
+                                <th class="py-3 px-6 text-left text-sm font-semibold uppercase rounded-tl-lg">Дата</th>
+                                <th class="py-3 px-6 text-left text-sm font-semibold uppercase">Соперник</th>
+                                <th class="py-3 px-6 text-left text-sm font-semibold uppercase">Место</th>
+                                <th class="py-3 px-6 text-left text-sm font-semibold uppercase rounded-tr-lg">Результат</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-gray-50 border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-4 px-6 text-gray-800">01.08.2025</td>
+                                <td class="py-4 px-6 text-gray-800">ФК "Звезда"</td>
+                                <td class="py-4 px-6 text-gray-800">Дома</td>
+                                <td class="py-4 px-6 text-gray-800">3:1 Победа</td>
+                            </tr>
+                            <tr class="bg-white border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-4 px-6 text-gray-800">08.08.2025</td>
+                                <td class="py-4 px-6 text-gray-800">ФК "Молния"</td>
+                                <td class="py-4 px-6 text-gray-800">В гостях</td>
+                                <td class="py-4 px-6 text-gray-800">2:2 Ничья</td>
+                            </tr>
+                            <tr class="bg-gray-50 border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-4 px-6 text-gray-800">15.08.2025</td>
+                                <td class="py-4 px-6 text-gray-800">ФК "Олимп"</td>
+                                <td class="py-4 px-6 text-gray-800">Дома</td>
+                                <td class="py-4 px-6 text-gray-800">-:-</td>
+                            </tr>
+                            <tr class="bg-white border-b border-gray-200 hover:bg-gray-100">
+                                <td class="py-4 px-6 text-gray-800">22.08.2025</td>
+                                <td class="py-4 px-6 text-gray-800">ФК "Тайфун"</td>
+                                <td class="py-4 px-6 text-gray-800">В гостях</td>
+                                <td class="py-4 px-6 text-gray-800">-:-</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Раздел "Галерея" -->
+        <section id="gallery" class="py-20 relative overflow-hidden">
+            <div class="relative z-10">
+                <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Галерея</h2>
+                <div class="relative w-full overflow-hidden">
+                    <div id="gallery-container" class="flex flex-nowrap gallery-container">
+                        <img src="https://placehold.co/1200x600/E0E0E0/333333?text=Фото+1" alt="Фото 1" class="gallery-image">
+                        <img src="https://placehold.co/1200x600/C0C0C0/333333?text=Фото+2" alt="Фото 2" class="gallery-image">
+                        <img src="https://placehold.co/1200x600/A0A0A0/333333?text=Фото+3" alt="Фото 3" class="gallery-image">
+                        <img src="https://placehold.co/1200x600/E0E0E0/333333?text=Фото+4" alt="Фото 4" class="gallery-image">
+                        <img src="https://placehold.co/1200x600/C0C0C0/333333?text=Фото+5" alt="Фото 5" class="gallery-image">
+                        <img src="https://placehold.co/1200x600/A0A0A0/333333?text=Фото+6" alt="Фото 6" class="gallery-image">
+                        <img src="https://placehold.co/1200x600/E0E0E0/333333?text=Фото+7" alt="Фото 7" class="gallery-image">
+                        <img src="https://placehold.co/1200x600/C0C0C0/333333?text=Фото+8" alt="Фото 8" class="gallery-image">
+                        <img src="https://placehold.co/1200x600/A0A0A0/333333?text=Фото+9" alt="Фото 9" class="gallery-image">
+                        <img src="https://placehold.co/1200x600/E0E0E0/333333?text=Фото+10" alt="Фото 10" class="gallery-image">
+                    </div>
+                    <!-- Навигационные кнопки -->
+                    <button class="absolute top-1/2 left-4 transform -translate-y-1/2 gallery-nav-button" onclick="scrollGallery(-1)">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="absolute top-1/2 right-4 transform -translate-y-1/2 gallery-nav-button" onclick="scrollGallery(1)">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Раздел "Мерч" -->
+        <section id="merch" class="py-20 relative overflow-hidden">
+            <div class="container mx-auto px-4 relative z-10">
+                <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Мерч</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
+                    <!-- Пример карточки товара -->
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105">
+                        <img src="https://placehold.co/400x300/C0C0C0/333333?text=Футболка" alt="Футболка" class="w-full h-64 object-cover">
+                        <div class="p-6 text-center">
+                            <h3 class="font-semibold text-xl text-gray-900 mb-2">Фирменная футболка</h3>
+                            <p class="text-gray-600 mb-4">1500 руб.</p>
+                            <button class="bg-gray-800 text-white font-bold py-2 px-6 rounded-full hover:bg-custom-blue transition-colors duration-300">Купить</button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105">
+                        <img src="https://placehold.co/400x300/A0A0A0/333333?text=Шарф" alt="Шарф" class="w-full h-64 object-cover">
+                        <div class="p-6 text-center">
+                            <h3 class="font-semibold text-xl text-gray-900 mb-2">Футбольный шарф</h3>
+                            <p class="text-gray-600 mb-4">800 руб.</p>
+                            <button class="bg-gray-800 text-white font-bold py-2 px-6 rounded-full hover:bg-custom-blue transition-colors duration-300">Купить</button>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-lg shadow-lg overflow-hidden transform transition-transform duration-300 hover:scale-105">
+                        <img src="https://placehold.co/400x300/B0B0B0/333333?text=Кружка" alt="Кружка" class="w-full h-64 object-cover">
+                        <div class="p-6 text-center">
+                            <h3 class="font-semibold text-xl text-gray-900 mb-2">Кружка с логотипом</h3>
+                            <p class="text-gray-600 mb-4">600 руб.</p>
+                            <button class="bg-gray-800 text-white font-bold py-2 px-6 rounded-full hover:bg-custom-blue transition-colors duration-300">Купить</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Раздел "О клубе" -->
+        <section id="about" class="py-20 relative overflow-hidden">
+            <div class="container mx-auto px-4 relative z-10">
+                <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">О Клубе</h2>
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                        Футбольный клуб был основан в 2005 году группой энтузиастов, увлеченных футболом. Начинали мы с любительских матчей на местных стадионах, но благодаря упорству, командному духу и поддержке болельщиков, мы смогли подняться на новый уровень.
+                    </p>
+                    <p class="text-lg text-gray-700 leading-relaxed mb-4">
+                        В 2010 году мы стали чемпионами региональной лиги, что открыло нам дорогу в профессиональный футбол. С тех пор мы непрерывно развиваемся, привлекаем молодых талантливых игроков и стремимся к новым вершинам. Наша цель — стать одним из ведущих клубов в стране, завоевывая сердца новых фанатов.
+                    </p>
+                    <p class="text-lg text-gray-700 leading-relaxed">
+                        Мы гордимся своей историей, нашими победами и достижениями, но больше всего — преданностью наших болельщиков. Спасибо, что вы с нами!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Раздел "Контакты" -->
+        <section id="contacts" class="py-20 relative overflow-hidden">
+            <div class="container mx-auto px-4 relative z-10">
+                <h2 class="text-4xl font-bold text-center mb-12 text-gray-800">Контакты</h2>
+                <div class="max-w-xl mx-auto bg-white rounded-lg shadow-md p-8 text-center">
+                    <p class="text-lg text-gray-700 mb-4">
+                        Следите за нами в социальных сетях.
+                    </p>
+                    <div class="flex justify-center space-x-6 mb-6">
+                        <a href="#" class="text-gray-800 hover:text-blue-500 transition-colors duration-300">
+                            <i class="fab fa-vk fa-3x"></i>
+                        </a>
+                        <a href="#" class="text-gray-800 hover:text-blue-400 transition-colors duration-300">
+                            <i class="fab fa-telegram-plane fa-3x"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Подвал (Footer) -->
+    <footer class="bg-gray-800 text-white text-center py-6">
+        <div class="container mx-auto">
+            <p>&copy; 2025 Футбольный Клуб. Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script>
+        let heroHeight = 0;
+        let documentIndex = 0;
+        
+        let rotationAngle = 0;
+        let parallaxImages = document.querySelectorAll('.parallax-section-image');
+
+        function rotateImages() {
+            rotationAngle += 0.1; // Скорость вращения
+            parallaxImages.forEach(img => {
+                const initialRotate = parseFloat(img.dataset.initialRotate);
+                img.style.transform = `rotate(${initialRotate + rotationAngle}deg)`;
+            });
+            requestAnimationFrame(rotateImages);
+        }
+
+        const heroSection = document.getElementById('home');
+        const heroPngs = document.querySelectorAll('.hero-png');
+        const pngComposition = document.getElementById('png-composition');
+
+        const flyingPngs = document.querySelectorAll('.parallax-flying-image');
+        
+        let mouseOffsetX = 0;
+        let mouseOffsetY = 0;
+
+        // Обновленная функция для параллакса от мыши
+        function updateHeroPngsWithMouse() {
+            heroPngs.forEach(png => {
+                const originalX = parseFloat(png.dataset.originalX);
+                const originalY = parseFloat(png.dataset.originalY);
+                const originalRotate = parseFloat(png.dataset.originalRotate);
+                const depth = parseFloat(png.dataset.depth) || 0; // Глубина эффекта для каждого изображения
+
+                // Расчет смещения на основе позиции мыши и глубины
+                // Изображения на переднем плане (больший depth) будут двигаться сильнее
+                const mouseTranslateX = -mouseOffsetX * 50 * depth;
+                const mouseTranslateY = -mouseOffsetY * 50 * depth;
+                
+                // Комбинируем начальную позицию с эффектом от мыши
+                const combinedTranslateX = originalX + mouseTranslateX;
+                const combinedTranslateY = originalY + mouseTranslateY;
+
+                png.style.transform = `translate(${combinedTranslateX}px, ${combinedTranslateY}px) rotate(${originalRotate}deg)`;
+            });
+        }
+        
+        // Добавление data-атрибутов для исходных позиций PNG изображений главной страницы
+        document.addEventListener('DOMContentLoaded', () => {
+            heroHeight = heroSection.offsetHeight;
+        
+            heroPngs.forEach(png => {
+                const style = window.getComputedStyle(png);
+                const transformMatrix = new DOMMatrixReadOnly(style.transform);
+        
+                const currentTranslateX = transformMatrix.m41;
+                const currentTranslateY = transformMatrix.m42;
+                const rotation = Math.atan2(transformMatrix.m21, transformMatrix.m11) * (180 / Math.PI);
+        
+                // Сохраняем начальные значения, чтобы к ним можно было применять смещение
+                png.dataset.originalX = currentTranslateX;
+                png.dataset.originalY = currentTranslateY;
+                png.dataset.originalRotate = rotation;
+            });
+        
+            // Инициализация начальных поворотов для параллакс-изображений под разделами
+            const sectionParallaxImages = document.querySelectorAll('.parallax-section-image');
+            sectionParallaxImages.forEach(img => {
+                const style = window.getComputedStyle(img);
+                const transformMatrix = new DOMMatrixReadOnly(style.transform);
+                const rotation = Math.atan2(transformMatrix.m21, transformMatrix.m11) * (180 / Math.PI);
+                img.dataset.initialRotate = `${rotation}`; 
+            });
+
+            // Инициализация летающих PNG
+            flyingPngs.forEach(png => {
+                const initialTop = parseFloat(png.dataset.initial-top);
+                const initialLeft = parseFloat(png.dataset.initial-left);
+                const initialRotate = parseFloat(png.dataset.initial-rotate);
+                png.style.top = `${initialTop}%`;
+                png.style.transform = `translateX(${initialLeft}px) rotate(${initialRotate}deg)`;
+            });
+
+            rotateImages();
+        });
+
+
+        // Обработчик события прокрутки
+        window.addEventListener('scroll', () => {
+            const scrollY = window.scrollY;
+            const scrollFactor = scrollY / heroHeight;
+
+            // Логика для смены цвета фона
+            const body = document.body;
+            const teamSection = document.getElementById('team');
+            const contactsSection = document.getElementById('contacts');
+            const blueSectionStart = teamSection.offsetTop;
+            const blueSectionEnd = contactsSection.offsetTop + contactsSection.offsetHeight;
+
+            if (scrollY > heroHeight / 2) {
+                body.classList.add('bg-custom-blue');
+                body.classList.remove('bg-gray-100');
+            } else {
+                body.classList.remove('bg-custom-blue');
+                body.classList.add('bg-gray-100');
+            }
+
+            // Логика для летающих PNG-изображений
+            if (scrollY > blueSectionStart - window.innerHeight && scrollY < blueSectionEnd) {
+                const scrollableHeight = blueSectionEnd - (blueSectionStart - window.innerHeight);
+                const progress = (scrollY - (blueSectionStart - window.innerHeight)) / scrollableHeight;
+                
+                flyingPngs.forEach((png) => {
+                    // Устанавливаем видимость, когда изображения находятся в пределах синей секции
+                    png.style.opacity = '0.8';
+
+                    const direction = parseFloat(png.dataset.direction);
+                    const initialLeft = (direction === 1) ? -png.offsetWidth : window.innerWidth;
+                    const initialRotate = parseFloat(png.dataset.initialRotate);
+                    
+                    let startX = (direction === 1) ? -png.offsetWidth : window.innerWidth;
+                    let endX = (direction === 1) ? window.innerWidth : -png.offsetWidth;
+
+                    const totalDistance = Math.abs(endX - startX) + png.offsetWidth;
+                    let currentTranslateX = startX + (progress * (endX - startX));
+                    
+                    if (direction === -1) {
+                         currentTranslateX = window.innerWidth - (progress * (window.innerWidth + png.offsetWidth));
+                    } else {
+                        currentTranslateX = -png.offsetWidth + (progress * (window.innerWidth + png.offsetWidth));
+                    }
+
+
+                    png.style.transform = `translateX(${currentTranslateX}px) rotate(${initialRotate}deg)`;
+                });
+            } else {
+                // Скрываем изображения, когда они не в синей секции
+                flyingPngs.forEach((png) => {
+                    png.style.opacity = '0';
+                    const direction = parseFloat(png.dataset.direction);
+                    const initialLeft = (direction === 1) ? -png.offsetWidth : window.innerWidth;
+                    const initialRotate = parseFloat(png.dataset.initialRotate);
+                    png.style.transform = `translateX(${initialLeft}px) rotate(${initialRotate}deg)`;
+                });
+            }
+        });
+
+        // Новый обработчик для параллакса от мыши
+        pngComposition.addEventListener('mousemove', (e) => {
+            const rect = pngComposition.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            // Нормализуем координаты мыши от -1 до 1
+            mouseOffsetX = (e.clientX - centerX) / (rect.width / 2);
+            mouseOffsetY = (e.clientY - centerY) / (rect.height / 2);
+            
+            // Вызываем функцию для обновления позиций PNG
+            updateHeroPngsWithMouse();
+        });
+        
+        // Код для галереи
+        const galleryContainer = document.getElementById('gallery-container');
+        const images = galleryContainer.querySelectorAll('.gallery-image');
+        const totalImages = images.length;
+        let currentImageIndex = 0;
+
+        function scrollGallery(direction) {
+            currentImageIndex += direction;
+            if (currentImageIndex < 0) {
+                currentImageIndex = totalImages - 1;
+            } else if (currentImageIndex >= totalImages) {
+                currentImageIndex = 0;
+            }
+            galleryContainer.scrollTo({
+                left: currentImageIndex * galleryContainer.offsetWidth,
+                behavior: 'smooth'
+            });
+        }
+    </script>
+</body>
+</html>
